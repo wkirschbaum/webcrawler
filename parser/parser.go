@@ -7,7 +7,11 @@ import (
 	"code.google.com/p/go.net/html"
 )
 
-func GetLinksFrom(body string) []string {
+type Parser struct {
+	BaseUrl string
+}
+
+func (parser *Parser) ParseLinks(body string) []string {
 	links := []string{}
 	doc, err := html.Parse(strings.NewReader(body))
 	if err != nil {
@@ -28,5 +32,16 @@ func GetLinksFrom(body string) []string {
 		}
 	}
 	f(doc)
-	return links
+
+	relativeLinks := []string{}
+	for _, link := range links {
+		if !strings.HasPrefix(link, "http://") {
+			if !strings.HasPrefix(link, "/") {
+				link = "/" + link
+			}
+			relativeLinks = append(relativeLinks, parser.BaseUrl+link)
+		}
+	}
+
+	return relativeLinks
 }
