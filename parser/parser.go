@@ -35,7 +35,7 @@ func (parser *Parser) ParseLinks(body string) []string {
 
 	relativeLinks := []string{}
 	for _, link := range links {
-		if !strings.HasPrefix(link, "http://") {
+		if !(strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://") || strings.HasPrefix(link, "www.")) {
 			if !strings.HasPrefix(link, "/") {
 				link = "/" + link
 			}

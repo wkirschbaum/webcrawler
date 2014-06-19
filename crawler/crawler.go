@@ -1,6 +1,7 @@
 package crawler
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/wkirschbaum/webcrawler/fetcher"
@@ -8,7 +9,7 @@ import (
 
 func Crawl(url string, depth int, f fetcher.Fetcher, ch chan fetcher.FetchedResult, chDone chan bool) {
 	m := map[string]bool{url: true}
-
+	limitChan := make(chan bool, 2)
 	var mx sync.Mutex
 	var wg sync.WaitGroup
 	var c2 func(string, int)
@@ -19,8 +20,12 @@ func Crawl(url string, depth int, f fetcher.Fetcher, ch chan fetcher.FetchedResu
 			return
 		}
 
+		limitChan <- true
 		fetchedResult, err := f.Fetch(url)
+		<-limitChan
+
 		if err != nil {
+			fmt.Println(err.Error())
 			return
 		}
 
