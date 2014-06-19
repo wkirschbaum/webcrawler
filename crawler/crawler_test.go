@@ -8,20 +8,35 @@ import (
 	"github.com/wkirschbaum/webcrawler/fetcher"
 )
 
-func TestCrawlAllUrlsOnOneDepth(t *testing.T) {
-	// fetchingChan := make(chan fetcher.FetchedResult)
+func handleFetchedData(ch chan fetcher.FetchedResult) {
+	for result := range ch {
 
-	result := Crawl("http://golang.org/", 1, fakeFetcherPopulated)
-
-	if num := len(result); num != 2 {
-		t.Errorf("\nexpected %d\n, but got %d", 2, num)
+		fmt.Printf("got result: %s\n", result.Url)
 	}
+}
 
+func TestCrawlAllUrlsOnOneDepth(t *testing.T) {
+	fetchingChan := make(chan fetcher.FetchedResult)
+	doneChan := make(chan bool)
+	go handleFetchedData(fetchingChan)
+	go Crawl("http://golang.org/", 1, fakeFetcherPopulated, fetchingChan, doneChan)
+
+	<-doneChan
+
+	close(doneChan)
+	close(fetchingChan)
 }
 
 func TestCrawlAllUrlsOnFiveDepth(t *testing.T) {
-	Crawl("http://golang.org/", 5, fakeFetcherPopulated)
-	fmt.Println("wait done")
+	fetchingChan := make(chan fetcher.FetchedResult)
+	doneChan := make(chan bool)
+	go handleFetchedData(fetchingChan)
+	go Crawl("http://golang.org/", 5, fakeFetcherPopulated, fetchingChan, doneChan)
+
+	<-doneChan
+
+	close(doneChan)
+	close(fetchingChan)
 }
 
 type fakeFetcher map[string]*fetcher.FetchedResult
