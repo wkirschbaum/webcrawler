@@ -8,7 +8,7 @@ import (
 )
 
 type Fetcher interface {
-	Fetch(url string) (result FetchedResult, err error)
+	Fetch(url string) (result *FetchedResult, err error)
 }
 
 type liveFetcher struct {
@@ -22,7 +22,7 @@ type FetchedResult struct {
 	Status int
 }
 
-func (f liveFetcher) Fetch(url string) (FetchedResult, error) {
+func (f liveFetcher) Fetch(url string) (*FetchedResult, error) {
 	body := ""
 	statusCode := 0
 
@@ -39,7 +39,7 @@ func (f liveFetcher) Fetch(url string) (FetchedResult, error) {
 	p := parser.Parser{BaseUrl: f.BaseUrl}
 	links := p.ParseLinks(body)
 
-	return FetchedResult{Url: url, Body: body, Urls: links, Status: statusCode}, err
+	return &FetchedResult{Url: url, Body: body, Urls: links, Status: statusCode}, err
 }
 
 func MakeFetcher(baseUrl string) Fetcher {

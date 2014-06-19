@@ -1,37 +1,44 @@
 package crawler
 
 import (
-	"fmt"
+	"sync"
 
 	"github.com/wkirschbaum/webcrawler/fetcher"
 )
 
-type Crawler struct {
-	Found   map[string]int
-	Fetched chan fetcher.FetchedResult
-}
-
-func (crawler *Crawler) Crawl(url string, depth int, fetcher fetcher.Fetcher) {
-	if depth <= 0 {
-		return
+func Crawl(url string, depth int, f fetcher.Fetcher) []fetcher.FetchedResult {
+	m := map[string]fetcher.FetchedResult{}
+	var mx sync.Mutex
+	var wg sync.WaitGroup
+	var c2 func(string, int)
+	c2 = func(url string, depth int) {
+		defer wg.Done()
+		if depth <= 0 {
+			return
+		}
+		fetchedResult, err := f.Fetch(url)
+		if err != nil {
+			return
+		}
+		mx.Lock()
+		for _, u := range fetchedResult.Urls {
+			if _, ok := m[u]; !ok {
+				m[u] = *fetchedResult
+				wg.Add(1)
+				go c2(u, depth-1)
+			}
+		}
+		mx.Unlock()
 	}
+	wg.Add(1)
+	c2(url, depth)
+	wg.Wait()
 
-	if _, ok := crawler.Found[url]; ok {
-		return
+	v := make([]fetcher.FetchedResult, len(m), len(m))
+	idx := 0
+	for _, value := range m {
+		v[idx] = value
+		idx++
 	}
-
-	result, err := fetcher.Fetch(url)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	crawler.Fetched <- result
-	crawler.Found[url] = result.Status
-
-	fmt.Printf("crawling %d urls from %s\n", len(result.Urls), url)
-	for _, u := range result.Urls {
-		go crawler.Crawl(u, depth-1, fetcher)
-	}
-	return
+	return v
 }
