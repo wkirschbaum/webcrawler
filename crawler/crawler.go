@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/wkirschbaum/webcrawler/fetcher"
+	"github.com/unboxed/webcrawler/fetcher"
 )
 
 func Crawl(url string, depth int, f fetcher.Fetcher, ch chan fetcher.FetchedResult, chDone chan bool) {

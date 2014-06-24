@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/wkirschbaum/webcrawler/parser"
+	"github.com/unboxed/webcrawler/parser"
 )
 
 type Fetcher interface {

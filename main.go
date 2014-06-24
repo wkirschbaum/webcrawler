@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/wkirschbaum/webcrawler/crawler"
-	"github.com/wkirschbaum/webcrawler/fetcher"
+	"github.com/unboxed/webcrawler/crawler"
+	"github.com/unboxed/webcrawler/fetcher"
 )
 
 func handleFetchedData(ch chan fetcher.FetchedResult) {

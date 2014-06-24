@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/wkirschbaum/webcrawler/fetcher"
+	"github.com/unboxed/webcrawler/fetcher"
 )
 
 func handleFetchedData(ch chan fetcher.FetchedResult) {
