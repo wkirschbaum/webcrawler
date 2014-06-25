@@ -70,6 +70,8 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/cmd/",
 		},
 		200,
+		false,
+		1,
 	},
 	"http://golang.org/pkg/": &fetcher.FetchedResult{
 		"http://golang.org/pkg/",
@@ -81,6 +83,8 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/pkg/os/",
 		},
 		200,
+		false,
+		1,
 	},
 	"http://golang.org/pkg/fmt/": &fetcher.FetchedResult{
 		"http://golang.org/pkg/fmt/",
@@ -90,6 +94,8 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/pkg/",
 		},
 		200,
+		false,
+		1,
 	},
 	"http://golang.org/pkg/os/": &fetcher.FetchedResult{
 		"http://golang.org/pkg/os/",
@@ -99,5 +105,7 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/pkg/",
 		},
 		200,
+		false,
+		1,
 	},
 }

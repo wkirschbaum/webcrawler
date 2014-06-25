@@ -16,10 +16,12 @@ type liveFetcher struct {
 }
 
 type FetchedResult struct {
-	Url    string
-	Body   string
-	Urls   []string
-	Status int
+	Url                  string
+	Body                 string
+	Urls                 []string
+	Status               int
+	HasDoubleEscapedHtml bool
+	Level                int
 }
 
 func (f liveFetcher) Fetch(url string) (*FetchedResult, error) {
@@ -39,7 +41,12 @@ func (f liveFetcher) Fetch(url string) (*FetchedResult, error) {
 	p := parser.Parser{BaseUrl: f.BaseUrl}
 	links := p.ParseLinks(body)
 
-	return &FetchedResult{Url: url, Body: body, Urls: links, Status: statusCode}, err
+	return &FetchedResult{
+		Url:                  url,
+		Body:                 body,
+		Urls:                 links,
+		Status:               statusCode,
+		HasDoubleEscapedHtml: p.HasDoubleEscapes(body)}, err
 }
 
 func MakeFetcher(baseUrl string) Fetcher {

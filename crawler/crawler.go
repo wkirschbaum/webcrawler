@@ -37,7 +37,7 @@ func (crawler *Crawler) Crawl(url string, f fetcher.Fetcher) {
 			fmt.Println(err.Error())
 			return
 		}
-
+		fetchedResult.Level = depth
 		crawler.Fetching <- *fetchedResult
 
 		mx.Lock()

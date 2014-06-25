@@ -5,6 +5,36 @@ import (
 	"testing"
 )
 
+func TestIdentifyDoubleEscapedHtmlWithout(t *testing.T) {
+	parser := Parser{}
+
+	s := `nothing here!`
+	result := parser.HasDoubleEscapes(s)
+	if result {
+		t.Errorf("result should be false")
+	}
+}
+
+func TestIdentifyDoubleEscapedHtmlWithlt(t *testing.T) {
+	parser := Parser{}
+
+	s := `somthing here &lt;a and here`
+	result := parser.HasDoubleEscapes(s)
+	if !result {
+		t.Errorf("result should be true")
+	}
+}
+
+func TestIdentifyDoubleEscapedHtmlWithAmp(t *testing.T) {
+	parser := Parser{}
+
+	s := `somthing here &amp;rarr and here`
+	result := parser.HasDoubleEscapes(s)
+	if !result {
+		t.Errorf("result should be true")
+	}
+}
+
 func TestParseLinksForLocalLinks(t *testing.T) {
 	parser := Parser{BaseUrl: "http://test.com"}
 

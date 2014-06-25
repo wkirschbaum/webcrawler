@@ -25,9 +25,13 @@ func handleFetchedData(ch chan fetcher.FetchedResult) {
 	defer logFile400.Close()
 	logFile500 := openLogFile("500.log")
 	defer logFile500.Close()
+	logFileDoubleEscaped := openLogFile("doublescaped.log")
+	defer logFileDoubleEscaped.Close()
 
 	for result := range ch {
 		switch {
+		case result.HasDoubleEscapedHtml:
+			log.SetOutput(logFileDoubleEscaped)
 		case result.Status > 199 && result.Status < 299:
 			log.SetOutput(logFile200)
 		case result.Status > 399 && result.Status < 499:
@@ -37,7 +41,7 @@ func handleFetchedData(ch chan fetcher.FetchedResult) {
 		default:
 			log.SetOutput(logFileTheRest)
 		}
-		log.Printf("got result: %s status: %d\n", result.Url, result.Status)
+		log.Printf("got result: %s status: %d on level %d\n", result.Url, result.Status, result.Level)
 	}
 }
 
@@ -50,7 +54,7 @@ func main() {
 	c := crawler.Crawler{
 		Fetching:    fetchingChan,
 		Done:        doneChan,
-		Depth:       5,
+		Depth:       10,
 		Concurrency: 6,
 	}
 

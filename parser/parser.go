@@ -2,6 +2,7 @@ package parser
 
 import (
 	"log"
+	"regexp"
 	"strings"
 
 	"code.google.com/p/go.net/html"
@@ -9,6 +10,12 @@ import (
 
 type Parser struct {
 	BaseUrl string
+}
+
+func (parser *Parser) HasDoubleEscapes(body string) bool {
+	letMatched, _ := regexp.MatchString("&lt;[a-z]", body)
+	ampMatched, _ := regexp.MatchString("&amp;(quot|rarr|larr|amp|#)", body)
+	return letMatched || ampMatched
 }
 
 func (parser *Parser) ParseLinks(body string) []string {
