@@ -7,9 +7,18 @@ import (
 	"github.com/unboxed/webcrawler/fetcher"
 )
 
-func Crawl(url string, depth int, f fetcher.Fetcher, ch chan fetcher.FetchedResult, chDone chan bool) {
+type Crawler struct {
+	Fetching    chan fetcher.FetchedResult
+	Done        chan bool
+	Depth       int
+	Concurrency int
+}
+
+func (crawler *Crawler) Crawl(url string, f fetcher.Fetcher) {
 	m := map[string]bool{url: true}
-	limitChan := make(chan bool, 2)
+
+	limitChan := make(chan bool, crawler.Concurrency)
+
 	var mx sync.Mutex
 	var wg sync.WaitGroup
 	var c2 func(string, int)
@@ -29,7 +38,7 @@ func Crawl(url string, depth int, f fetcher.Fetcher, ch chan fetcher.FetchedResu
 			return
 		}
 
-		ch <- *fetchedResult
+		crawler.Fetching <- *fetchedResult
 
 		mx.Lock()
 		for _, u := range fetchedResult.Urls {
@@ -43,7 +52,7 @@ func Crawl(url string, depth int, f fetcher.Fetcher, ch chan fetcher.FetchedResu
 	}
 
 	wg.Add(1)
-	c2(url, depth)
+	c2(url, crawler.Depth)
 	wg.Wait()
-	chDone <- true
+	crawler.Done <- true
 }

@@ -18,7 +18,15 @@ func main() {
 	fetchingChan := make(chan fetcher.FetchedResult)
 	doneChan := make(chan bool)
 	go handleFetchedData(fetchingChan)
-	go crawler.Crawl(baseUrl, 5, fetcher.MakeFetcher(baseUrl), fetchingChan, doneChan)
+
+	c := crawler.Crawler{
+		Fetching:    fetchingChan,
+		Done:        doneChan,
+		Depth:       5,
+		Concurrency: 6,
+	}
+
+	go c.Crawl(baseUrl, fetcher.MakeFetcher(baseUrl))
 
 	<-doneChan
 
