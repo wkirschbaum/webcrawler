@@ -13,9 +13,9 @@ type Parser struct {
 }
 
 func (parser *Parser) HasDoubleEscapes(body string) bool {
-	letMatched, _ := regexp.MatchString("&lt;[a-z]", body)
+	ltMatched, _ := regexp.MatchString("&lt;[a-z]", body)
 	ampMatched, _ := regexp.MatchString("&amp;(quot|rarr|larr|amp|#)", body)
-	return letMatched || ampMatched
+	return ltMatched || ampMatched
 }
 
 func (parser *Parser) ParseLinks(body string) []string {
