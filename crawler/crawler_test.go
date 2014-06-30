@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/wkirschbaum/webcrawler/fetcher"
+	"github.com/unboxed/webcrawler/fetcher"
 )
 
 func handleFetchedData(ch chan fetcher.FetchedResult) {
 	for result := range ch {
-
 		fmt.Printf("got result: %s\n", result.Url)
 	}
 }
@@ -19,7 +18,14 @@ func TestCrawlAllUrlsOnOneDepth(t *testing.T) {
 	fetchingChan := make(chan fetcher.FetchedResult)
 	doneChan := make(chan bool)
 	go handleFetchedData(fetchingChan)
-	go Crawl("http://golang.org/", 1, fakeFetcherPopulated, fetchingChan, doneChan)
+
+	crawler := Crawler{
+		Fetching:    fetchingChan,
+		Done:        doneChan,
+		Depth:       5,
+		Concurrency: 6,
+	}
+	go crawler.Crawl("http://golang.org/", fakeFetcherPopulated)
 
 	<-doneChan
 
@@ -31,7 +37,14 @@ func TestCrawlAllUrlsOnFiveDepth(t *testing.T) {
 	fetchingChan := make(chan fetcher.FetchedResult)
 	doneChan := make(chan bool)
 	go handleFetchedData(fetchingChan)
-	go Crawl("http://golang.org/", 5, fakeFetcherPopulated, fetchingChan, doneChan)
+
+	crawler := Crawler{
+		Fetching:    fetchingChan,
+		Done:        doneChan,
+		Depth:       5,
+		Concurrency: 6,
+	}
+	go crawler.Crawl("http://golang.org/", fakeFetcherPopulated)
 
 	<-doneChan
 
@@ -57,6 +70,8 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/cmd/",
 		},
 		200,
+		false,
+		1,
 	},
 	"http://golang.org/pkg/": &fetcher.FetchedResult{
 		"http://golang.org/pkg/",
@@ -68,6 +83,8 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/pkg/os/",
 		},
 		200,
+		false,
+		1,
 	},
 	"http://golang.org/pkg/fmt/": &fetcher.FetchedResult{
 		"http://golang.org/pkg/fmt/",
@@ -77,6 +94,8 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/pkg/",
 		},
 		200,
+		false,
+		1,
 	},
 	"http://golang.org/pkg/os/": &fetcher.FetchedResult{
 		"http://golang.org/pkg/os/",
@@ -86,5 +105,7 @@ var fakeFetcherPopulated = fakeFetcher{
 			"http://golang.org/pkg/",
 		},
 		200,
+		false,
+		1,
 	},
 }
